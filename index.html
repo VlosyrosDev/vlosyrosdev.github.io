@@ -1,28 +1,385 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Name - Portfolio</title>
+    <title>vlosyrosdev</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Noto Serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#111111',
+                        darkcard: '#161616',
+                        darkborder: '#262626',
+                        gold: {
+                            DEFAULT: '#a17f48',
+                            light: '#bfa168',
+                            dark: '#7e6133',
+                            glow: 'rgba(161, 127, 72, 0.15)',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
-        h1 { margin-bottom: 5px; }
-        .project { border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 8px; }
-        .project a { text-decoration: none; color: #0366d6; font-weight: bold; }
+        :root {
+            --bg-dark: #111111;
+            --gold-primary: #a17f48;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #d1d1d1;
+            font-family: 'Noto Serif', serif;
+            background-image: radial-gradient(circle at 50% 0%, rgba(161, 127, 72, 0.05) 0%, transparent 70%);
+            background-attachment: fixed;
+        }
+
+        /* Card styles & hover states */
+        .project-card {
+            background-color: #161616;
+            border: 1px solid #262626;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .project-card:hover {
+            border-color: #a17f48;
+            box-shadow: 0 8px 30px rgba(161, 127, 72, 0.12);
+            transform: translateY(-3px);
+            background-color: #1a1a1a;
+        }
+
+        .project-card:hover .card-title {
+            color: #bfa168;
+        }
+
+        .project-card:hover .external-icon {
+            opacity: 1;
+            transform: translate(3px, -3px);
+        }
+
+        .source-btn {
+            position: relative;
+            z-index: 10;
+            background-color: rgba(17, 17, 17, 0.8);
+            border: 1px solid #333;
+            color: #a17f48;
+            transition: all 0.2s ease;
+        }
+
+        .source-btn:hover {
+            border-color: #a17f48;
+            background-color: #a17f48;
+            color: #111111;
+            box-shadow: 0 0 12px rgba(161, 127, 72, 0.25);
+        }
+
+        /* Smooth custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a17f48;
+        }
     </style>
 </head>
-<body>
-    <h1>Hi, I'm vlosyrosdev 👋</h1>
-    <p>Welcome to my personal portfolio. Here are some of the projects I've been working on:</p>
+<body class="min-h-screen flex flex-col justify-between selection:bg-gold selection:text-darkbg">
 
-    <h2>Projects</h2>
-    
-    <div class="project">
-        <h3>PeakVisualizer</h3>
-        <p>A brief description of what PeakVisualizer does and why you built it.</p>
-        <a href="/PeakVisualizer/">View Project &rarr;</a>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-16 w-full flex-grow">
+        
+        <!-- Header & Intro Section -->
+        <header class="mb-12 sm:mb-16 border-b border-darkborder pb-8 sm:pb-10">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                <!-- Profile Picture & Name -->
+                <div class="flex items-center space-x-4 sm:space-x-5">
+                    <img 
+                        src="logo.png" 
+                        alt="Vlosyros Logo" 
+                        class="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-gold/60 object-cover bg-darkcard shadow-lg shadow-gold/10"
+                        onerror="this.onerror=null; this.src='https://placehold.co/128x128/161616/a17f48?text=V';"
+                    />
+                    <div>
+                        <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-white">
+                            Vlosyros
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Prominent GitHub Profile Button -->
+                <a 
+                    href="https://github.com/vlosyrosdev" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-lg bg-gold/10 text-gold border border-gold/40 hover:bg-gold hover:text-darkbg font-sans text-xs sm:text-sm font-semibold transition-all duration-200 shadow-md shadow-gold/5 w-full sm:w-auto text-center"
+                >
+                    <i class="fa-brands fa-github text-base"></i>
+                    <span>GitHub Profile</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
+                </a>
+            </div>
+
+            <!-- Statement & Disclaimer -->
+            <div class="space-y-4 max-w-3xl">
+                <p class="text-base sm:text-xl text-gray-200 leading-relaxed font-light">
+                    I like collecting and processing data, and these projects are frontends to display my data.
+                </p>
+                <p class="text-xs sm:text-sm text-gold/80 italic border-l-2 border-gold/40 pl-3 sm:pl-4 py-0.5">
+                    Note: The frontends are vibecoded, but the data collection and processing is entirely done by me.
+                </p>
+            </div>
+        </header>
+
+        <main>
+            <div class="flex items-center justify-between mb-6 sm:mb-8">
+                <h2 class="text-lg sm:text-xl font-semibold text-white tracking-wide flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-gold inline-block"></span>
+                    Projects
+                </h2>
+                <span id="project-count" class="text-xs text-gray-500 font-sans tracking-wider uppercase">Loading...</span>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loading" class="py-16 sm:py-20 text-center">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gold border-t-transparent mb-4"></div>
+                <p class="text-xs sm:text-sm text-gray-500 italic">Fetching live projects...</p>
+            </div>
+
+            <!-- Error State Container -->
+            <div id="error-container" class="hidden py-12 px-6 rounded-lg border border-red-900/30 bg-red-950/10 text-center">
+                <p class="text-red-400 font-medium mb-2">Unable to load repositories right now.</p>
+                <p class="text-sm text-gray-500">Please check back again shortly.</p>
+            </div>
+
+            <!-- Projects Grid -->
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 hidden">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+        </main>
+
+        <section class="mt-16 sm:mt-20 border-t border-darkborder pt-10">
+            <h2 class="text-lg sm:text-xl font-semibold text-white tracking-wide flex items-center gap-2 mb-6">
+                <span class="w-2 h-2 rounded-full bg-gold inline-block"></span>
+                Contact
+            </h2>
+            <div class="bg-darkcard border border-darkborder rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg">
+                        <i class="fa-brands fa-discord"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-sans uppercase tracking-wider">Discord</p>
+                        <p id="discord-username" class="text-white font-mono font-medium text-base">_vlosyros</p>
+                    </div>
+                </div>
+                <button 
+                    id="copy-discord-btn"
+                    onclick="copyDiscordTag()"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 hover:bg-gold text-gold hover:text-darkbg border border-gold/30 text-xs font-sans font-medium transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                    <i class="fa-regular fa-copy"></i>
+                    <span id="copy-btn-text">Copy Username</span>
+                </button>
+            </div>
+        </section>
+
     </div>
 
-    <!-- Add more projects here as you build them -->
+    <footer class="border-t border-darkborder py-6 sm:py-8 text-center text-xs text-gray-600 w-full mt-12">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>&copy; <span id="year"></span> Vlosyros. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const GITHUB_USERNAME = 'vlosyrosdev';
+        const FALLBACK_USERNAME = 'Vlosyros';
+
+        // Repositories to exclude (config files, website root, metadata repos)
+        const EXCLUDED_REPOS = [
+            'vlosyrosdev.github.io',
+            'vlosyros.github.io',
+            '.github',
+            'vlosyrosdev',
+            'vlosyros',
+            'config'
+        ];
+
+        async function fetchUserProjects() {
+            const loadingEl = document.getElementById('loading');
+            const gridEl = document.getElementById('projects-grid');
+            const errorEl = document.getElementById('error-container');
+            const countEl = document.getElementById('project-count');
+
+            try {
+                let response = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`);
+                
+                if (!response.ok && response.status === 404) {
+                    response = await fetch(`https://api.github.com/users/${FALLBACK_USERNAME}/repos?per_page=100&sort=updated`);
+                }
+
+                if (!response.ok) {
+                    throw new Error(`GitHub API request failed with status ${response.status}`);
+                }
+
+                const repositories = await response.json();
+
+                // Filter logic:
+                // 1. Must NOT be in EXCLUDED_REPOS
+                // 2. MUST have a live site (has_pages OR homepage non-empty)
+                const liveProjects = repositories.filter(repo => {
+                    const isExcluded = EXCLUDED_REPOS.includes(repo.name.toLowerCase());
+                    if (isExcluded) return false;
+
+                    const hasGitHubPages = repo.has_pages;
+                    const hasCustomHomepage = repo.homepage && repo.homepage.trim().length > 0;
+
+                    return hasGitHubPages || hasCustomHomepage;
+                });
+
+                loadingEl.classList.add('hidden');
+
+                if (liveProjects.length === 0) {
+                    countEl.textContent = '0 Projects';
+                    errorEl.classList.remove('hidden');
+                    errorEl.querySelector('p').textContent = 'No live project demos found at this time.';
+                    return;
+                }
+
+                countEl.textContent = `${liveProjects.length} ${liveProjects.length === 1 ? 'Project' : 'Projects'}`;
+                renderProjects(liveProjects);
+                gridEl.classList.remove('hidden');
+
+            } catch (err) {
+                console.error('Error fetching repositories:', err);
+                loadingEl.classList.add('hidden');
+                errorEl.classList.remove('hidden');
+                countEl.textContent = 'Error';
+            }
+        }
+
+        function renderProjects(projects) {
+            const gridEl = document.getElementById('projects-grid');
+            gridEl.innerHTML = '';
+
+            projects.forEach(repo => {
+                // Determine Live URL (prefer Pages URL, fallback to repo homepage)
+                let liveUrl = `https://${repo.owner.login}.github.io/${repo.name}/`;
+                if (repo.homepage && repo.homepage.trim().startsWith('http')) {
+                    liveUrl = repo.homepage.trim();
+                }
+
+                const description = repo.description 
+                    ? repo.description 
+                    : 'Interactive frontend interface and data presentation.';
+
+                const card = document.createElement('div');
+                card.className = 'project-card rounded-lg p-5 sm:p-6 flex flex-col justify-between group';
+                
+                // Clicking the card opens the live website
+                card.addEventListener('click', () => {
+                    window.open(liveUrl, '_blank', 'noopener,noreferrer');
+                });
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <h3 class="card-title text-lg sm:text-xl font-bold text-white transition-colors duration-200">
+                                ${formatTitle(repo.name)}
+                            </h3>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs sm:text-sm external-icon opacity-50 transition-all duration-200"></i>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-400 font-light leading-relaxed mb-6">
+                            ${escapeHtml(description)}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-darkborder/60">
+                        <!-- Source Button with event.stopPropagation -->
+                        <a 
+                            href="${repo.html_url}" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            onclick="event.stopPropagation();"
+                            class="source-btn text-xs font-sans px-3 py-1.5 rounded-md flex items-center gap-1.5"
+                            title="View GitHub Repository"
+                        >
+                            <i class="fa-brands fa-github text-sm"></i>
+                            <span>Source</span>
+                        </a>
+                    </div>
+                `;
+
+                gridEl.appendChild(card);
+            });
+        }
+
+        function copyDiscordTag() {
+            const username = "_vlosyros";
+            const btnText = document.getElementById('copy-btn-text');
+            
+            // Clipboard copy with fallback
+            const tempInput = document.createElement("input");
+            tempInput.value = username;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            btnText.textContent = "Copied!";
+            setTimeout(() => {
+                btnText.textContent = "Copy Username";
+            }, 2000);
+        }
+
+        // Helper function to turn repo names like "PeakVisualizer" into clean titles
+        function formatTitle(str) {
+            return str
+                .replace(/[-_]/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        // Helper function to prevent XSS in repository descriptions
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Start fetch on load
+        window.addEventListener('DOMContentLoaded', fetchUserProjects);
+    </script>
 </body>
 </html>
