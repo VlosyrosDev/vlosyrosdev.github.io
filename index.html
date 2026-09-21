@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vlosyros — data collection, processing and interactive frontends.">
+    <meta name="theme-color" content="#111111">
     <title>Vlosyros</title>
 
     <!-- Favicon for Standard Web Browsers -->
@@ -50,7 +52,10 @@
         :root {
             --bg-dark: #111111;
             --gold-primary: #a17f48;
+            --gold-light: #bfa168;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
             background-color: var(--bg-dark);
@@ -58,77 +63,198 @@
             font-family: 'Noto Serif', serif;
             background-image: radial-gradient(circle at 50% 0%, rgba(161, 127, 72, 0.05) 0%, transparent 70%);
             background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Card styles & hover states */
+        /* ---------------------------------------------------------------
+           Project card — stretched-link pattern for native navigation
+        ---------------------------------------------------------------- */
         .project-card {
+            position: relative;
             background-color: #161616;
             border: 1px solid #262626;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
+            touch-action: manipulation;
+            transition: transform 0.15s ease,
+                        border-color 0.15s ease,
+                        box-shadow 0.15s ease,
+                        background-color 0.15s ease;
+        }
+
+        .card-link {
+            color: inherit;
+            text-decoration: none;
+            outline: none;
+        }
+
+        .card-link::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: 0.5rem;
+        }
+
+        .source-btn,
+        .action-btn {
+            position: relative;
+            z-index: 2;
+            transition: background-color 0.15s ease,
+                        border-color 0.15s ease,
+                        color 0.15s ease,
+                        transform 0.12s ease,
+                        box-shadow 0.15s ease;
             -webkit-tap-highlight-color: transparent;
-        }
-
-        .project-card:hover {
-            border-color: #a17f48;
-            box-shadow: 0 8px 30px rgba(161, 127, 72, 0.12);
-            transform: translateY(-3px);
-            background-color: #1a1a1a;
-        }
-
-        .project-card:hover .card-title {
-            color: #bfa168;
-        }
-
-        .project-card:hover .external-icon {
-            opacity: 1;
-            transform: translate(3px, -3px);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         .source-btn {
-            position: relative;
-            z-index: 10;
             background-color: rgba(17, 17, 17, 0.8);
             border: 1px solid #333;
-            color: #a17f48;
-            transition: all 0.2s ease;
+            color: var(--gold-primary);
         }
 
-        .source-btn:hover {
-            border-color: #a17f48;
-            background-color: #a17f48;
-            color: #111111;
-            box-shadow: 0 0 12px rgba(161, 127, 72, 0.25);
+        /* --------------------------------------------------------------
+           FOCUS VISIBILITY
+           Only :focus-visible — NOT :focus or :focus-within.
+           A tap focuses the anchor but does NOT match :focus-visible,
+           so the card border no longer sticks after navigating away.
+        ---------------------------------------------------------------- */
+        .project-card:has(.card-link:focus-visible),
+        .project-card:has(.source-btn:focus-visible),
+        .project-card:has(.action-btn:focus-visible) {
+            border-color: var(--gold-primary);
+            background-color: #1a1a1a;
+            box-shadow: 0 0 0 3px rgba(161, 127, 72, 0.18);
         }
 
-        /* Smooth custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        .card-link:focus-visible {
+            outline: 2px solid var(--gold-light);
+            outline-offset: 4px;
+            border-radius: 2px;
         }
-        ::-webkit-scrollbar-track {
-            background: #111111;
+
+        .action-btn:focus-visible,
+        .source-btn:focus-visible {
+            outline: 2px solid var(--gold-light);
+            outline-offset: 2px;
         }
+
+        /* --------------------------------------------------------------
+           PRESSED / ACTIVE STATES
+        ---------------------------------------------------------------- */
+
+        .project-card.touch-active {
+            border-color: var(--gold-primary) !important;
+            background-color: #222222 !important;
+            transform: scale(0.98) !important;
+        }
+
+        .project-card.touch-active .card-title {
+            color: var(--gold-light) !important;
+        }
+
+        .source-btn:active,
+        .action-btn:active,
+        .source-btn.touch-active,
+        .action-btn.touch-active {
+            border-color: var(--gold-primary) !important;
+            background-color: var(--gold-primary) !important;
+            color: #111111 !important;
+            transform: scale(0.95) !important;
+            box-shadow: 0 0 12px rgba(161, 127, 72, 0.3) !important;
+        }
+
+        /* Pressed card on desktop only (pointer: fine) — avoids stuck
+           :active on mobile when navigating away. */
+        @media (hover: hover) and (pointer: fine) {
+            .project-card:has(.card-link:active) {
+                border-color: var(--gold-primary);
+                background-color: #222222;
+                transform: scale(0.985);
+            }
+
+            .project-card:hover {
+                border-color: var(--gold-primary);
+                box-shadow: 0 8px 30px rgba(161, 127, 72, 0.12);
+                transform: translateY(-3px);
+                background-color: #1a1a1a;
+            }
+
+            .project-card:hover .card-title { color: var(--gold-light); }
+
+            .project-card:hover .external-icon {
+                opacity: 1;
+                transform: translate(3px, -3px);
+            }
+
+            .source-btn:hover,
+            .action-btn:hover {
+                border-color: var(--gold-primary);
+                background-color: var(--gold-primary);
+                color: #111111;
+                box-shadow: 0 0 12px rgba(161, 127, 72, 0.25);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .project-card,
+            .source-btn,
+            .action-btn,
+            .card-title,
+            .external-icon {
+                transition: none !important;
+            }
+            .project-card:hover,
+            .project-card:has(.card-link:active),
+            .project-card.touch-active,
+            .source-btn:active, .source-btn.touch-active,
+            .action-btn:active, .action-btn.touch-active {
+                transform: none !important;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111111; }
         ::-webkit-scrollbar-thumb {
             background: #2a2a2a;
             border-radius: 3px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a17f48;
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-primary); }
+
+        .skeleton {
+            background: linear-gradient(90deg, #181818 25%, #202020 50%, #181818 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s ease-in-out infinite;
+            border-radius: 6px;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .skeleton { animation: none; background: #1b1b1b; }
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-gold selection:text-darkbg">
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-16 w-full flex-grow">
-        
+
         <!-- Header & Intro Section -->
         <header class="mb-12 sm:mb-16 border-b border-darkborder pb-8 sm:pb-10">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
-                <!-- Profile Picture & Name -->
                 <div class="flex items-center space-x-4 sm:space-x-5">
-                    <img 
-                        src="logo.png" 
-                        alt="Vlosyros Logo" 
+                    <img
+                        src="logo.png"
+                        alt="Vlosyros Logo"
+                        width="64"
+                        height="64"
                         class="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-gold/60 object-cover bg-darkcard shadow-lg shadow-gold/10"
                         onerror="this.onerror=null; this.src='https://placehold.co/128x128/161616/a17f48?text=V';"
                     />
@@ -139,20 +265,18 @@
                     </div>
                 </div>
 
-                <!-- Prominent GitHub Profile Button -->
-                <a 
-                    href="https://github.com/vlosyrosdev" 
-                    target="_blank" 
+                <a
+                    href="https://github.com/vlosyrosdev"
+                    target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-lg bg-gold/10 text-gold border border-gold/40 hover:bg-gold hover:text-darkbg font-sans text-xs sm:text-sm font-semibold transition-all duration-200 shadow-md shadow-gold/5 w-full sm:w-auto text-center"
+                    class="action-btn inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-lg bg-gold/10 text-gold border border-gold/40 font-sans text-xs sm:text-sm font-semibold shadow-md shadow-gold/5 w-full sm:w-auto text-center"
                 >
-                    <i class="fa-brands fa-github text-base"></i>
+                    <i class="fa-brands fa-github text-base" aria-hidden="true"></i>
                     <span>GitHub Profile</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70" aria-hidden="true"></i>
                 </a>
             </div>
 
-            <!-- Statement & Disclaimer -->
             <div class="space-y-4 max-w-3xl">
                 <p class="text-base sm:text-xl text-gray-200 leading-relaxed font-light">
                     I like collecting and processing data, and my projects are frontends to display my data.
@@ -166,41 +290,68 @@
         <main>
             <div class="flex items-center justify-between mb-6 sm:mb-8">
                 <h2 class="text-lg sm:text-xl font-semibold text-white tracking-wide flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-gold inline-block"></span>
+                    <span class="w-2 h-2 rounded-full bg-gold inline-block" aria-hidden="true"></span>
                     Projects
                 </h2>
-                <span id="project-count" class="text-xs text-gray-500 font-sans tracking-wider uppercase">Loading...</span>
+                <span id="project-count"
+                      class="text-xs text-gray-500 font-sans tracking-wider uppercase"
+                      aria-live="polite"
+                      aria-atomic="true">Loading…</span>
             </div>
 
-            <!-- Loading Spinner -->
-            <div id="loading" class="py-16 sm:py-20 text-center">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gold border-t-transparent mb-4"></div>
-                <p class="text-xs sm:text-sm text-gray-500 italic">Fetching live projects...</p>
+            <p id="stale-notice"
+               class="hidden text-xs text-gold/70 italic mb-4"
+               role="status"></p>
+
+            <!-- Loading Skeleton -->
+            <div id="loading" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" aria-hidden="true">
+                <div class="rounded-lg border border-darkborder bg-darkcard p-5 sm:p-6">
+                    <div class="skeleton h-5 w-2/3 mb-4"></div>
+                    <div class="skeleton h-3 w-full mb-2"></div>
+                    <div class="skeleton h-3 w-4/5 mb-6"></div>
+                    <div class="skeleton h-7 w-24"></div>
+                </div>
+                <div class="rounded-lg border border-darkborder bg-darkcard p-5 sm:p-6">
+                    <div class="skeleton h-5 w-1/2 mb-4"></div>
+                    <div class="skeleton h-3 w-full mb-2"></div>
+                    <div class="skeleton h-3 w-3/5 mb-6"></div>
+                    <div class="skeleton h-7 w-24"></div>
+                </div>
             </div>
 
-            <!-- Error State Container -->
-            <div id="error-container" class="hidden py-12 px-6 rounded-lg border border-red-900/30 bg-red-950/10 text-center">
-                <p class="text-red-400 font-medium mb-2">Unable to load repositories right now.</p>
-                <p class="text-sm text-gray-500">Please check back again shortly.</p>
+            <!-- Error / Empty State Container -->
+            <div id="error-container"
+                 class="hidden py-12 px-6 rounded-lg border border-red-900/30 bg-red-950/10 text-center"
+                 role="status">
+                <p id="error-title" class="text-red-400 font-medium mb-2">Unable to load repositories right now.</p>
+                <p id="error-message" class="text-sm text-gray-500 mb-5">Please check back again shortly.</p>
+                <button
+                    type="button"
+                    id="retry-btn"
+                    class="action-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gold/10 text-gold border border-gold/30 text-xs font-sans font-medium"
+                >
+                    <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                    <span>Try again</span>
+                </button>
             </div>
 
             <!-- Projects Grid -->
             <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 hidden">
-                <!-- Dynamically populated via JavaScript -->
+                <!-- Dynamically populated -->
             </div>
         </main>
 
         <!-- Contact Section -->
         <section class="mt-16 sm:mt-20 border-t border-darkborder pt-10">
             <h2 class="text-lg sm:text-xl font-semibold text-white tracking-wide flex items-center gap-2 mb-6">
-                <span class="w-2 h-2 rounded-full bg-gold inline-block"></span>
+                <span class="w-2 h-2 rounded-full bg-gold inline-block" aria-hidden="true"></span>
                 Contact
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Discord Card -->
                 <div class="bg-darkcard border border-darkborder rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg shrink-0">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg shrink-0" aria-hidden="true">
                             <i class="fa-brands fa-discord"></i>
                         </div>
                         <div>
@@ -208,35 +359,39 @@
                             <p id="discord-username" class="text-white font-mono font-medium text-base">_vlosyros</p>
                         </div>
                     </div>
-                    <button 
-                        id="copy-discord-btn"
-                        onclick="copyToClipboard('_vlosyros', 'discord-copy-text')"
-                        class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 hover:bg-gold text-gold hover:text-darkbg border border-gold/30 text-xs font-sans font-medium transition-all duration-200 flex items-center justify-center gap-2 shrink-0"
+                    <button
+                        type="button"
+                        data-copy-value="_vlosyros"
+                        data-copy-success="Copied!"
+                        aria-label="Copy Discord username"
+                        class="action-btn w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 text-gold border border-gold/30 text-xs font-sans font-medium flex items-center justify-center gap-2 shrink-0"
                     >
-                        <i class="fa-regular fa-copy"></i>
-                        <span id="discord-copy-text">Copy Username</span>
+                        <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                        <span class="copy-label">Copy Username</span>
                     </button>
                 </div>
 
                 <!-- Email Card -->
                 <div class="bg-darkcard border border-darkborder rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-gold/10 border border-gold/30 text-gold flex items-center justify-center text-lg shrink-0">
+                        <div class="w-10 h-10 rounded-lg bg-gold/10 border border-gold/30 text-gold flex items-center justify-center text-lg shrink-0" aria-hidden="true">
                             <i class="fa-regular fa-envelope"></i>
                         </div>
                         <div>
                             <p class="text-xs text-gray-400 font-sans uppercase tracking-wider">Email</p>
-                            <a href="mailto:volsyros.dev@gmail.com" class="text-white font-mono font-medium text-sm sm:text-base hover:text-gold transition-colors">volsyros.dev@gmail.com</a>
-                            <p class="text-[11px] text-gray-500 italic mt-0.5">(Yes, I am aware of the typo in the address, but email adresses can't be changed once created.)</p>
+                            <a href="mailto:volsyros.dev@gmail.com" class="text-white font-mono font-medium text-sm sm:text-base hover:text-gold transition-colors break-all">volsyros.dev@gmail.com</a>
+                            <p class="text-[11px] text-gray-500 italic mt-0.5">(Yes, I am aware of the typo in the address, but email addresses can't be changed once created.)</p>
                         </div>
                     </div>
-                    <button 
-                        id="copy-email-btn"
-                        onclick="copyToClipboard('volsyros.dev@gmail.com', 'email-copy-text')"
-                        class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 hover:bg-gold text-gold hover:text-darkbg border border-gold/30 text-xs font-sans font-medium transition-all duration-200 flex items-center justify-center gap-2 shrink-0"
+                    <button
+                        type="button"
+                        data-copy-value="volsyros.dev@gmail.com"
+                        data-copy-success="Copied!"
+                        aria-label="Copy email address"
+                        class="action-btn w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 text-gold border border-gold/30 text-xs font-sans font-medium flex items-center justify-center gap-2 shrink-0"
                     >
-                        <i class="fa-regular fa-copy"></i>
-                        <span id="email-copy-text">Copy Email</span>
+                        <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                        <span class="copy-label">Copy Email</span>
                     </button>
                 </div>
             </div>
@@ -245,178 +400,607 @@
     </div>
 
     <footer class="border-t border-darkborder py-6 sm:py-8 text-center text-xs text-gray-600 w-full mt-12">
-        <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="max-w-5xl mx-auto px-6">
             <p>&copy; <span id="year"></span> Vlosyros. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
+    (function () {
+        'use strict';
 
-        const GITHUB_USERNAME = 'vlosyrosdev';
-        const FALLBACK_USERNAME = 'Vlosyros';
+        const CONFIG = {
+            primaryUsername: 'vlosyrosdev',
+            fallbackUsername: 'vlosyros',
+            excludedRepos: [
+                'vlosyrosdev.github.io',
+                'vlosyros.github.io',
+                '.github',
+                'vlosyrosdev',
+                'vlosyros',
+                'config'
+            ],
+            excludeForks: false,
+            excludeArchived: true,
+            maxPages: 3,
+            cacheKey: 'vlosyros:repos:v2',
+            cacheTTL: 30 * 60 * 1000,
+            pressReleaseDelay: 50,
+            scrollThreshold: 8,
+            clickGestureWindow: 500
+        };
 
-        // Repositories to exclude (config files, website root, metadata repos)
-        const EXCLUDED_REPOS = [
-            'vlosyrosdev.github.io',
-            'vlosyros.github.io',
-            '.github',
-            'vlosyrosdev',
-            'vlosyros',
-            'config'
-        ];
+        const state = { loading: false };
+        const els = {};
 
-        async function fetchUserProjects() {
-            const loadingEl = document.getElementById('loading');
-            const gridEl = document.getElementById('projects-grid');
-            const errorEl = document.getElementById('error-container');
-            const countEl = document.getElementById('project-count');
+        document.addEventListener('DOMContentLoaded', init);
 
-            try {
-                let response = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`);
-                
-                if (!response.ok && response.status === 404) {
-                    response = await fetch(`https://api.github.com/users/${FALLBACK_USERNAME}/repos?per_page=100&sort=updated`);
+        function init() {
+            els.year         = document.getElementById('year');
+            els.loading      = document.getElementById('loading');
+            els.grid         = document.getElementById('projects-grid');
+            els.error        = document.getElementById('error-container');
+            els.errorTitle   = document.getElementById('error-title');
+            els.errorMessage = document.getElementById('error-message');
+            els.retry        = document.getElementById('retry-btn');
+            els.count        = document.getElementById('project-count');
+            els.stale        = document.getElementById('stale-notice');
+
+            if (els.year) els.year.textContent = new Date().getFullYear();
+            if (els.retry) els.retry.addEventListener('click', () => loadProjects(true));
+
+            bindCopyButtons();
+            bindTouchFeedback();
+
+            loadProjects(false);
+        }
+
+        /* ------------------------------------------------------------------
+           Touch press-feedback manager
+        ------------------------------------------------------------------ */
+        function bindTouchFeedback() {
+            let activeEl = null;
+            let startX = 0;
+            let startY = 0;
+            let isScrolling = false;
+            let lastTouchEndTime = 0;
+
+            const pressTimers = new WeakMap();
+
+            function addPress(el) {
+                const existing = pressTimers.get(el);
+                if (existing) {
+                    clearTimeout(existing);
+                    pressTimers.delete(el);
+                }
+                el.classList.add('touch-active');
+            }
+
+            function removePress(el, delay) {
+                const existing = pressTimers.get(el);
+                if (existing) {
+                    clearTimeout(existing);
+                    pressTimers.delete(el);
                 }
 
-                if (!response.ok) {
-                    throw new Error(`GitHub API request failed with status ${response.status}`);
-                }
-
-                const repositories = await response.json();
-
-                // Filter logic:
-                // 1. Must NOT be in EXCLUDED_REPOS
-                // 2. MUST have a live site (has_pages OR homepage non-empty)
-                const liveProjects = repositories.filter(repo => {
-                    const isExcluded = EXCLUDED_REPOS.includes(repo.name.toLowerCase());
-                    if (isExcluded) return false;
-
-                    const hasGitHubPages = repo.has_pages;
-                    const hasCustomHomepage = repo.homepage && repo.homepage.trim().length > 0;
-
-                    return hasGitHubPages || hasCustomHomepage;
-                });
-
-                loadingEl.classList.add('hidden');
-
-                if (liveProjects.length === 0) {
-                    countEl.textContent = '0 Projects';
-                    errorEl.classList.remove('hidden');
-                    errorEl.querySelector('p').textContent = 'No live project demos found at this time.';
+                if (!delay) {
+                    el.classList.remove('touch-active');
                     return;
                 }
 
-                countEl.textContent = `${liveProjects.length} ${liveProjects.length === 1 ? 'Project' : 'Projects'}`;
-                renderProjects(liveProjects);
-                gridEl.classList.remove('hidden');
+                const timer = setTimeout(() => {
+                    pressTimers.delete(el);
+                    el.classList.remove('touch-active');
+                }, delay);
+                pressTimers.set(el, timer);
+            }
 
+            function blurActive() {
+                const active = document.activeElement;
+                if (active && active !== document.body && typeof active.blur === 'function') {
+                    active.blur();
+                }
+            }
+
+            function clearAllPresses() {
+                document.querySelectorAll('.touch-active').forEach(el => {
+                    const timer = pressTimers.get(el);
+                    if (timer) {
+                        clearTimeout(timer);
+                        pressTimers.delete(el);
+                    }
+                    el.classList.remove('touch-active');
+                });
+                // Also drop any residual focus so :focus / :focus-visible
+                // states don't keep the card styled on return.
+                blurActive();
+                activeEl = null;
+                isScrolling = false;
+            }
+
+            document.addEventListener('touchstart', (e) => {
+                if (activeEl) {
+                    removePress(activeEl, 0);
+                    activeEl = null;
+                }
+
+                const btn = e.target.closest('.source-btn, .action-btn');
+                const card = !btn && e.target.closest('.project-card');
+                const target = btn || card;
+                if (!target) return;
+
+                const touch = e.touches[0];
+                if (!touch) return;
+
+                startX = touch.clientX;
+                startY = touch.clientY;
+                isScrolling = false;
+                activeEl = target;
+                addPress(target);
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!activeEl || isScrolling) return;
+                const touch = e.touches[0];
+                if (!touch) return;
+
+                const dx = Math.abs(touch.clientX - startX);
+                const dy = Math.abs(touch.clientY - startY);
+
+                if (dx > CONFIG.scrollThreshold || dy > CONFIG.scrollThreshold) {
+                    isScrolling = true;
+                    removePress(activeEl, 0);
+                    activeEl = null;
+                }
+            }, { passive: true });
+
+            window.addEventListener('scroll', () => {
+                if (!activeEl) return;
+                isScrolling = true;
+                removePress(activeEl, 0);
+                activeEl = null;
+            }, { passive: true });
+
+            document.addEventListener('touchend', () => {
+                lastTouchEndTime = Date.now();
+                if (!activeEl) return;
+
+                const el = activeEl;
+                activeEl = null;
+
+                if (isScrolling) {
+                    removePress(el, 0);
+                    return;
+                }
+                removePress(el, CONFIG.pressReleaseDelay);
+            }, { passive: true });
+
+            document.addEventListener('touchcancel', () => {
+                if (activeEl) {
+                    removePress(activeEl, 0);
+                    activeEl = null;
+                }
+            }, { passive: true });
+
+            /* ------------------------------------------------------------
+               Capture-phase click handler
+               - Strips .touch-active synchronously (before navigation).
+               - Blurs the clicked anchor so its focus doesn't survive the
+                 trip to the new tab (this was the cause of the stuck card
+                 border on return).
+               - Cancels clicks that followed a scroll.
+            ------------------------------------------------------------ */
+            document.addEventListener('click', (e) => {
+                const stillPressed = document.querySelectorAll('.touch-active');
+                if (stillPressed.length) {
+                    stillPressed.forEach(el => {
+                        const timer = pressTimers.get(el);
+                        if (timer) {
+                            clearTimeout(timer);
+                            pressTimers.delete(el);
+                        }
+                        el.classList.remove('touch-active');
+                    });
+                }
+
+                // If the user clicked an anchor that opens a new tab,
+                // blur it so focus doesn't linger on the old page.
+                const anchor = e.target.closest('a[target="_blank"]');
+                if (anchor) {
+                    setTimeout(() => {
+                        if (document.activeElement === anchor) anchor.blur();
+                    }, 0);
+                }
+
+                const withinWindow = (Date.now() - lastTouchEndTime) < CONFIG.clickGestureWindow;
+                if (withinWindow && isScrolling) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    isScrolling = false;
+                }
+            }, true);
+
+            /* ------------------------------------------------------------
+               Lifecycle cleanup
+            ------------------------------------------------------------ */
+            window.addEventListener('pagehide', clearAllPresses);
+            window.addEventListener('pageshow', clearAllPresses);
+            window.addEventListener('blur', clearAllPresses);
+            window.addEventListener('focus', clearAllPresses);
+            document.addEventListener('visibilitychange', clearAllPresses);
+        }
+
+        /* ------------------------------------------------------------------
+           Data loading
+        ------------------------------------------------------------------ */
+        async function loadProjects(forceRefresh) {
+            if (state.loading) return;
+            state.loading = true;
+
+            showLoading();
+            hideError();
+            if (els.stale) els.stale.classList.add('hidden');
+
+            const cached = readCache();
+            const cacheFresh = cached && (Date.now() - cached.timestamp) < CONFIG.cacheTTL;
+
+            if (!forceRefresh && cacheFresh) {
+                renderProjects(cached.repos);
+                state.loading = false;
+                return;
+            }
+
+            try {
+                const repos = await fetchRepos();
+                writeCache(repos);
+                renderProjects(repos);
             } catch (err) {
-                console.error('Error fetching repositories:', err);
-                loadingEl.classList.add('hidden');
-                errorEl.classList.remove('hidden');
-                countEl.textContent = 'Error';
+                console.error('[vlosyros] Failed to load repositories:', err);
+
+                if (cached) {
+                    renderProjects(cached.repos);
+                    if (els.stale) {
+                        els.stale.textContent = 'Showing cached results — live data could not be refreshed.';
+                        els.stale.classList.remove('hidden');
+                    }
+                } else {
+                    showError(err);
+                }
+            } finally {
+                state.loading = false;
             }
         }
 
-        function renderProjects(projects) {
-            const gridEl = document.getElementById('projects-grid');
-            gridEl.innerHTML = '';
+        async function fetchRepos() {
+            const usernames = [CONFIG.primaryUsername, CONFIG.fallbackUsername];
+            let lastError = null;
 
-            projects.forEach(repo => {
-                // Determine Live URL (prefer Pages URL, fallback to repo homepage)
-                let liveUrl = `https://${repo.owner.login}.github.io/${repo.name}/`;
-                if (repo.homepage && repo.homepage.trim().startsWith('http')) {
-                    liveUrl = repo.homepage.trim();
+            for (const username of usernames) {
+                try {
+                    return await fetchAllRepos(username);
+                } catch (err) {
+                    lastError = err;
+                    if (err.status !== 404) throw err;
                 }
+            }
+            throw lastError || new Error('Unable to resolve GitHub account.');
+        }
 
-                const description = repo.description 
-                    ? repo.description 
-                    : 'Interactive frontend interface and data presentation.';
+        async function fetchAllRepos(username) {
+            const all = [];
 
-                const card = document.createElement('div');
-                card.className = 'project-card rounded-lg p-5 sm:p-6 flex flex-col justify-between group';
-                
-                // Clicking the card opens the live website
-                card.addEventListener('click', () => {
-                    window.open(liveUrl, '_blank', 'noopener,noreferrer');
+            for (let page = 1; page <= CONFIG.maxPages; page++) {
+                const url = 'https://api.github.com/users/' +
+                    encodeURIComponent(username) +
+                    '/repos?per_page=100&page=' + page + '&sort=updated';
+
+                const res = await fetch(url, {
+                    headers: { 'Accept': 'application/vnd.github+json' }
                 });
 
-                card.innerHTML = `
-                    <div>
-                        <div class="flex items-start justify-between gap-4 mb-3">
-                            <h3 class="card-title text-lg sm:text-xl font-bold text-white transition-colors duration-200">
-                                ${formatTitle(repo.name)}
-                            </h3>
-                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs sm:text-sm external-icon opacity-50 transition-all duration-200"></i>
-                        </div>
-                        <p class="text-xs sm:text-sm text-gray-400 font-light leading-relaxed mb-6">
-                            ${escapeHtml(description)}
-                        </p>
-                    </div>
+                if (!res.ok) {
+                    const error = new Error('GitHub API responded with ' + res.status);
+                    error.status = res.status;
 
-                    <div class="flex items-center justify-between pt-4 border-t border-darkborder/60">
-                        <!-- Source Button with event.stopPropagation -->
-                        <a 
-                            href="${repo.html_url}" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            onclick="event.stopPropagation();"
-                            class="source-btn text-xs font-sans px-3 py-1.5 rounded-md flex items-center gap-1.5"
-                            title="View GitHub Repository"
-                        >
-                            <i class="fa-brands fa-github text-sm"></i>
-                            <span>Source</span>
-                        </a>
-                    </div>
-                `;
+                    const remaining = res.headers.get('x-ratelimit-remaining');
+                    const reset     = res.headers.get('x-ratelimit-reset');
+                    if (res.status === 403 && remaining === '0' && reset) {
+                        error.isRateLimit = true;
+                        error.resetAt = Number(reset) * 1000;
+                    }
+                    throw error;
+                }
 
-                gridEl.appendChild(card);
+                const batch = await res.json();
+                if (!Array.isArray(batch)) {
+                    throw new Error('Unexpected response shape from GitHub API.');
+                }
+
+                all.push(...batch.map(slimRepo));
+                if (batch.length < 100) break;
+            }
+
+            return all;
+        }
+
+        function slimRepo(repo) {
+            return {
+                name: repo.name,
+                description: repo.description,
+                html_url: repo.html_url,
+                homepage: repo.homepage,
+                has_pages: repo.has_pages,
+                owner: { login: repo.owner && repo.owner.login },
+                fork: repo.fork,
+                archived: repo.archived,
+                disabled: repo.disabled,
+                pushed_at: repo.pushed_at,
+                updated_at: repo.updated_at
+            };
+        }
+
+        /* ------------------------------------------------------------------
+           Cache
+        ------------------------------------------------------------------ */
+        function readCache() {
+            try {
+                const raw = localStorage.getItem(CONFIG.cacheKey);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (!parsed || !Array.isArray(parsed.repos)) return null;
+                if (typeof parsed.timestamp !== 'number') return null;
+                return parsed;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function writeCache(repos) {
+            try {
+                localStorage.setItem(CONFIG.cacheKey, JSON.stringify({
+                    timestamp: Date.now(),
+                    repos: repos
+                }));
+            } catch (err) {
+                // Quota exceeded / private mode — non-fatal.
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           Filtering & rendering
+        ------------------------------------------------------------------ */
+        function selectLiveProjects(repos) {
+            const excluded = new Set(CONFIG.excludedRepos.map(n => n.toLowerCase()));
+
+            return repos
+                .filter(repo => {
+                    if (!repo || typeof repo.name !== 'string') return false;
+                    if (repo.disabled) return false;
+                    if (CONFIG.excludeArchived && repo.archived) return false;
+                    if (CONFIG.excludeForks && repo.fork) return false;
+                    if (excluded.has(repo.name.toLowerCase())) return false;
+
+                    const homepage = (repo.homepage || '').trim();
+                    return Boolean(repo.has_pages) || homepage.length > 0;
+                })
+                .map(repo => Object.assign({}, repo, { __liveUrl: resolveLiveUrl(repo) }))
+                .filter(repo => Boolean(repo.__liveUrl));
+        }
+
+        function resolveLiveUrl(repo) {
+            const homepage = (repo.homepage || '').trim();
+
+            if (homepage) {
+                if (/^https?:\/\//i.test(homepage)) return homepage;
+                if (homepage.includes('.') && !/\s/.test(homepage)) {
+                    return 'https://' + homepage;
+                }
+            }
+
+            if (repo.has_pages && repo.owner && repo.owner.login) {
+                return 'https://' + repo.owner.login + '.github.io/' + repo.name + '/';
+            }
+
+            return null;
+        }
+
+        function renderProjects(rawRepos) {
+            const projects = selectLiveProjects(rawRepos || []);
+
+            hideLoading();
+            hideError();
+
+            if (!projects.length) {
+                els.grid.classList.add('hidden');
+                els.grid.replaceChildren();
+                els.count.textContent = '0 Projects';
+                showEmpty();
+                return;
+            }
+
+            els.count.textContent = projects.length +
+                (projects.length === 1 ? ' Project' : ' Projects');
+
+            const fragment = document.createDocumentFragment();
+            projects.forEach(repo => fragment.appendChild(buildCard(repo)));
+
+            els.grid.replaceChildren(fragment);
+            els.grid.classList.remove('hidden');
+        }
+
+        function buildCard(repo) {
+            const title       = formatTitle(repo.name);
+            const description = (repo.description && repo.description.trim()) ||
+                                'Interactive frontend interface and data presentation.';
+
+            const card = document.createElement('article');
+            card.className = 'project-card rounded-lg p-5 sm:p-6 flex flex-col justify-between';
+
+            const top = document.createElement('div');
+
+            const head = document.createElement('div');
+            head.className = 'flex items-start justify-between gap-4 mb-3';
+
+            const h3 = document.createElement('h3');
+            h3.className = 'card-title text-lg sm:text-xl font-bold text-white transition-colors duration-200';
+
+            const link = document.createElement('a');
+            link.className = 'card-link';
+            link.href = repo.__liveUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = title;
+            h3.appendChild(link);
+
+            const icon = document.createElement('i');
+            icon.className = 'fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs sm:text-sm external-icon opacity-50 transition-all duration-200';
+            icon.setAttribute('aria-hidden', 'true');
+
+            head.append(h3, icon);
+
+            const p = document.createElement('p');
+            p.className = 'text-xs sm:text-sm text-gray-400 font-light leading-relaxed mb-6';
+            p.textContent = description;
+
+            top.append(head, p);
+
+            const footer = document.createElement('div');
+            footer.className = 'flex items-center justify-start gap-3 pt-4 border-t border-darkborder/60';
+
+            const source = document.createElement('a');
+            source.className = 'source-btn text-xs font-sans px-3 py-1.5 rounded-md flex items-center gap-1.5';
+            source.href = repo.html_url;
+            source.target = '_blank';
+            source.rel = 'noopener noreferrer';
+            source.title = 'View source on GitHub';
+
+            const ghIcon = document.createElement('i');
+            ghIcon.className = 'fa-brands fa-github text-sm';
+            ghIcon.setAttribute('aria-hidden', 'true');
+
+            const sourceLabel = document.createElement('span');
+            sourceLabel.textContent = 'Source';
+
+            source.append(ghIcon, sourceLabel);
+            footer.appendChild(source);
+
+            card.append(top, footer);
+            return card;
+        }
+
+        /* ------------------------------------------------------------------
+           UI state helpers
+        ------------------------------------------------------------------ */
+        function showLoading() {
+            if (els.loading) els.loading.classList.remove('hidden');
+            els.grid.classList.add('hidden');
+            els.count.textContent = 'Loading…';
+        }
+
+        function hideLoading() {
+            if (els.loading) els.loading.classList.add('hidden');
+        }
+
+        function showError(err) {
+            hideLoading();
+            els.grid.classList.add('hidden');
+            els.count.textContent = 'Error';
+
+            if (err && err.isRateLimit) {
+                els.errorTitle.textContent = 'GitHub API rate limit reached.';
+                els.errorMessage.textContent = err.resetAt
+                    ? 'Try again in about ' + minutesUntil(err.resetAt) + ' minute(s).'
+                    : 'Please try again a little later.';
+            } else {
+                els.errorTitle.textContent = 'Unable to load repositories right now.';
+                els.errorMessage.textContent = 'Please check back again shortly.';
+            }
+
+            els.error.classList.remove('hidden');
+        }
+
+        function showEmpty() {
+            els.errorTitle.textContent = 'No live project demos found at this time.';
+            els.errorMessage.textContent = 'Check back soon — new projects are added regularly.';
+            els.error.classList.remove('hidden');
+        }
+
+        function hideError() {
+            els.error.classList.add('hidden');
+        }
+
+        function minutesUntil(timestamp) {
+            const diff = Math.max(0, timestamp - Date.now());
+            return Math.max(1, Math.ceil(diff / 60000));
+        }
+
+        /* ------------------------------------------------------------------
+           Copy to clipboard
+        ------------------------------------------------------------------ */
+        function bindCopyButtons() {
+            document.querySelectorAll('[data-copy-value]').forEach(btn => {
+                btn.addEventListener('click', () => handleCopy(btn));
             });
         }
 
-        function copyToClipboard(text, elementId) {
-            const btnText = document.getElementById(elementId);
-            
-            navigator.clipboard.writeText(text).then(() => {
-                btnText.textContent = "Copied!";
-                setTimeout(() => {
-                    btnText.textContent = elementId.includes('discord') ? "Copy Username" : "Copy Email";
-                }, 2000);
-            }).catch(() => {
-                const tempInput = document.createElement("input");
-                tempInput.value = text;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempInput);
+        async function handleCopy(btn) {
+            const value = btn.getAttribute('data-copy-value') || '';
+            const label = btn.querySelector('.copy-label');
+            const successText = btn.getAttribute('data-copy-success') || 'Copied!';
+            const originalText = label ? label.textContent : '';
 
-                btnText.textContent = "Copied!";
-                setTimeout(() => {
-                    btnText.textContent = elementId.includes('discord') ? "Copy Username" : "Copy Email";
-                }, 2000);
-            });
+            const ok = await copyText(value);
+
+            if (!label) return;
+            label.textContent = ok ? successText : 'Copy failed';
+
+            clearTimeout(btn._copyTimer);
+            btn._copyTimer = setTimeout(() => {
+                label.textContent = originalText;
+            }, 2000);
         }
 
-        // Helper function to turn repo names like "PeakVisualizer" into clean titles
+        async function copyText(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (err) {
+                    // fall through to legacy path
+                }
+            }
+
+            try {
+                const input = document.createElement('textarea');
+                input.value = text;
+                input.setAttribute('readonly', '');
+                input.style.position = 'fixed';
+                input.style.top = '-1000px';
+                input.style.opacity = '0';
+                document.body.appendChild(input);
+                input.select();
+                input.setSelectionRange(0, input.value.length);
+                const ok = document.execCommand('copy');
+                document.body.removeChild(input);
+                return ok;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        /* ------------------------------------------------------------------
+           Utilities
+        ------------------------------------------------------------------ */
         function formatTitle(str) {
-            return str
-                .replace(/[-_]/g, ' ')
-                .replace(/\b\w/g, l => l.toUpperCase());
+            return String(str)
+                .replace(/[-_]+/g, ' ')
+                .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+                .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .replace(/\b\w/g, c => c.toUpperCase());
         }
-
-        // Helper function to prevent XSS in repository descriptions
-        function escapeHtml(str) {
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // Start fetch on load
-        window.addEventListener('DOMContentLoaded', fetchUserProjects);
+    })();
     </script>
 </body>
 </html>
