@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vlosyrosdev</title>
+    <title>Vlosyros</title>
+
+    <!-- Favicon for Standard Web Browsers -->
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Favicon for Apple Devices / Mobile Home Screen -->
+    <link rel="apple-touch-icon" href="logo.png">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -149,7 +155,7 @@
             <!-- Statement & Disclaimer -->
             <div class="space-y-4 max-w-3xl">
                 <p class="text-base sm:text-xl text-gray-200 leading-relaxed font-light">
-                    I like collecting and processing data, and these projects are frontends to display my data.
+                    I like collecting and processing data, and my projects are frontends to display my data.
                 </p>
                 <p class="text-xs sm:text-sm text-gold/80 italic border-l-2 border-gold/40 pl-3 sm:pl-4 py-0.5">
                     Note: The frontends are vibecoded, but the data collection and processing is entirely done by me.
@@ -184,29 +190,55 @@
             </div>
         </main>
 
+        <!-- Contact Section -->
         <section class="mt-16 sm:mt-20 border-t border-darkborder pt-10">
             <h2 class="text-lg sm:text-xl font-semibold text-white tracking-wide flex items-center gap-2 mb-6">
                 <span class="w-2 h-2 rounded-full bg-gold inline-block"></span>
                 Contact
             </h2>
-            <div class="bg-darkcard border border-darkborder rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg">
-                        <i class="fa-brands fa-discord"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Discord Card -->
+                <div class="bg-darkcard border border-darkborder rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-brands fa-discord"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-sans uppercase tracking-wider">Discord</p>
+                            <p id="discord-username" class="text-white font-mono font-medium text-base">_vlosyros</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs text-gray-400 font-sans uppercase tracking-wider">Discord</p>
-                        <p id="discord-username" class="text-white font-mono font-medium text-base">_vlosyros</p>
-                    </div>
+                    <button 
+                        id="copy-discord-btn"
+                        onclick="copyToClipboard('_vlosyros', 'discord-copy-text')"
+                        class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 hover:bg-gold text-gold hover:text-darkbg border border-gold/30 text-xs font-sans font-medium transition-all duration-200 flex items-center justify-center gap-2 shrink-0"
+                    >
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="discord-copy-text">Copy Username</span>
+                    </button>
                 </div>
-                <button 
-                    id="copy-discord-btn"
-                    onclick="copyDiscordTag()"
-                    class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 hover:bg-gold text-gold hover:text-darkbg border border-gold/30 text-xs font-sans font-medium transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                    <i class="fa-regular fa-copy"></i>
-                    <span id="copy-btn-text">Copy Username</span>
-                </button>
+
+                <!-- Email Card -->
+                <div class="bg-darkcard border border-darkborder rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-gold/10 border border-gold/30 text-gold flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-regular fa-envelope"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-sans uppercase tracking-wider">Email</p>
+                            <a href="mailto:volsyros.dev@gmail.com" class="text-white font-mono font-medium text-sm sm:text-base hover:text-gold transition-colors">volsyros.dev@gmail.com</a>
+                            <p class="text-[11px] text-gray-500 italic mt-0.5">(Yes, I am aware of the typo in the address)</p>
+                        </div>
+                    </div>
+                    <button 
+                        id="copy-email-btn"
+                        onclick="copyToClipboard('volsyros.dev@gmail.com', 'email-copy-text')"
+                        class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gold/10 hover:bg-gold text-gold hover:text-darkbg border border-gold/30 text-xs font-sans font-medium transition-all duration-200 flex items-center justify-center gap-2 shrink-0"
+                    >
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="email-copy-text">Copy Email</span>
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -343,22 +375,27 @@
             });
         }
 
-        function copyDiscordTag() {
-            const username = "_vlosyros";
-            const btnText = document.getElementById('copy-btn-text');
+        function copyToClipboard(text, elementId) {
+            const btnText = document.getElementById(elementId);
             
-            // Clipboard copy with fallback
-            const tempInput = document.createElement("input");
-            tempInput.value = username;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
+            navigator.clipboard.writeText(text).then(() => {
+                btnText.textContent = "Copied!";
+                setTimeout(() => {
+                    btnText.textContent = elementId.includes('discord') ? "Copy Username" : "Copy Email";
+                }, 2000);
+            }).catch(() => {
+                const tempInput = document.createElement("input");
+                tempInput.value = text;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
 
-            btnText.textContent = "Copied!";
-            setTimeout(() => {
-                btnText.textContent = "Copy Username";
-            }, 2000);
+                btnText.textContent = "Copied!";
+                setTimeout(() => {
+                    btnText.textContent = elementId.includes('discord') ? "Copy Username" : "Copy Email";
+                }, 2000);
+            });
         }
 
         // Helper function to turn repo names like "PeakVisualizer" into clean titles
