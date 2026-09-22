@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Vlosyros — data collection, processing and interactive frontends.">
+    <meta name="description" content="Vlosyros — data collection, processing, analysis, and games.">
     <meta name="theme-color" content="#111111">
     <title>Vlosyros</title>
 
@@ -279,10 +279,10 @@
 
             <div class="space-y-4 max-w-3xl">
                 <p class="text-base sm:text-xl text-gray-200 leading-relaxed font-light">
-                    I like collecting and processing data, and my projects are frontends to display my data.
+                    I collect and process data, run analyses, and make games.
                 </p>
                 <p class="text-xs sm:text-sm text-gold/80 italic border-l-2 border-gold/40 pl-3 sm:pl-4 py-0.5">
-                    Note: The frontends are vibecoded, but the data collection and processing is entirely done by me.
+                    Note: The frontends are vibecoded and are meant solely as a means to showcase the underlying data. The data collection, processing, and analysis is entirely done by me.
                 </p>
             </div>
         </header>
@@ -298,10 +298,6 @@
                       aria-live="polite"
                       aria-atomic="true">Loading…</span>
             </div>
-
-            <p id="stale-notice"
-               class="hidden text-xs text-gold/70 italic mb-4"
-               role="status"></p>
 
             <!-- Loading Skeleton -->
             <div id="loading" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" aria-hidden="true">
@@ -323,7 +319,7 @@
             <div id="error-container"
                  class="hidden py-12 px-6 rounded-lg border border-red-900/30 bg-red-950/10 text-center"
                  role="status">
-                <p id="error-title" class="text-red-400 font-medium mb-2">Unable to load repositories right now.</p>
+                <p id="error-title" class="text-red-400 font-medium mb-2">Unable to load projects right now.</p>
                 <p id="error-message" class="text-sm text-gray-500 mb-5">Please check back again shortly.</p>
                 <button
                     type="button"
@@ -409,21 +405,7 @@
         'use strict';
 
         const CONFIG = {
-            primaryUsername: 'vlosyrosdev',
-            fallbackUsername: 'vlosyros',
-            excludedRepos: [
-                'vlosyrosdev.github.io',
-                'vlosyros.github.io',
-                '.github',
-                'vlosyrosdev',
-                'vlosyros',
-                'config'
-            ],
-            excludeForks: false,
-            excludeArchived: true,
-            maxPages: 3,
-            cacheKey: 'vlosyros:repos:v2',
-            cacheTTL: 30 * 60 * 1000,
+            projectsUrl: 'projects.json',
             pressReleaseDelay: 50,
             scrollThreshold: 8,
             clickGestureWindow: 500
@@ -443,15 +425,14 @@
             els.errorMessage = document.getElementById('error-message');
             els.retry        = document.getElementById('retry-btn');
             els.count        = document.getElementById('project-count');
-            els.stale        = document.getElementById('stale-notice');
 
             if (els.year) els.year.textContent = new Date().getFullYear();
-            if (els.retry) els.retry.addEventListener('click', () => loadProjects(true));
+            if (els.retry) els.retry.addEventListener('click', () => loadProjects());
 
             bindCopyButtons();
             bindTouchFeedback();
 
-            loadProjects(false);
+            loadProjects();
         }
 
         /* ------------------------------------------------------------------
@@ -632,180 +613,68 @@
         /* ------------------------------------------------------------------
            Data loading
         ------------------------------------------------------------------ */
-        async function loadProjects(forceRefresh) {
+        async function loadProjects() {
             if (state.loading) return;
             state.loading = true;
 
             showLoading();
             hideError();
-            if (els.stale) els.stale.classList.add('hidden');
-
-            const cached = readCache();
-            const cacheFresh = cached && (Date.now() - cached.timestamp) < CONFIG.cacheTTL;
-
-            if (!forceRefresh && cacheFresh) {
-                renderProjects(cached.repos);
-                state.loading = false;
-                return;
-            }
 
             try {
-                const repos = await fetchRepos();
-                writeCache(repos);
-                renderProjects(repos);
+                const projects = await fetchProjects();
+                renderProjects(projects);
             } catch (err) {
-                console.error('[vlosyros] Failed to load repositories:', err);
-
-                if (cached) {
-                    renderProjects(cached.repos);
-                    if (els.stale) {
-                        els.stale.textContent = 'Showing cached results — live data could not be refreshed.';
-                        els.stale.classList.remove('hidden');
-                    }
-                } else {
-                    showError(err);
-                }
+                console.error('[vlosyros] Failed to load projects:', err);
+                showError(err);
             } finally {
                 state.loading = false;
             }
         }
 
-        async function fetchRepos() {
-            const usernames = [CONFIG.primaryUsername, CONFIG.fallbackUsername];
-            let lastError = null;
+        async function fetchProjects() {
+            const res = await fetch(CONFIG.projectsUrl, {
+                headers: { 'Accept': 'application/json' }
+            });
 
-            for (const username of usernames) {
-                try {
-                    return await fetchAllRepos(username);
-                } catch (err) {
-                    lastError = err;
-                    if (err.status !== 404) throw err;
-                }
-            }
-            throw lastError || new Error('Unable to resolve GitHub account.');
-        }
-
-        async function fetchAllRepos(username) {
-            const all = [];
-
-            for (let page = 1; page <= CONFIG.maxPages; page++) {
-                const url = 'https://api.github.com/users/' +
-                    encodeURIComponent(username) +
-                    '/repos?per_page=100&page=' + page + '&sort=updated';
-
-                const res = await fetch(url, {
-                    headers: { 'Accept': 'application/vnd.github+json' }
-                });
-
-                if (!res.ok) {
-                    const error = new Error('GitHub API responded with ' + res.status);
-                    error.status = res.status;
-
-                    const remaining = res.headers.get('x-ratelimit-remaining');
-                    const reset     = res.headers.get('x-ratelimit-reset');
-                    if (res.status === 403 && remaining === '0' && reset) {
-                        error.isRateLimit = true;
-                        error.resetAt = Number(reset) * 1000;
-                    }
-                    throw error;
-                }
-
-                const batch = await res.json();
-                if (!Array.isArray(batch)) {
-                    throw new Error('Unexpected response shape from GitHub API.');
-                }
-
-                all.push(...batch.map(slimRepo));
-                if (batch.length < 100) break;
+            if (!res.ok) {
+                const error = new Error('Failed to load projects (' + res.status + ').');
+                error.status = res.status;
+                throw error;
             }
 
-            return all;
-        }
-
-        function slimRepo(repo) {
-            return {
-                name: repo.name,
-                description: repo.description,
-                html_url: repo.html_url,
-                homepage: repo.homepage,
-                has_pages: repo.has_pages,
-                owner: { login: repo.owner && repo.owner.login },
-                fork: repo.fork,
-                archived: repo.archived,
-                disabled: repo.disabled,
-                pushed_at: repo.pushed_at,
-                updated_at: repo.updated_at
-            };
-        }
-
-        /* ------------------------------------------------------------------
-           Cache
-        ------------------------------------------------------------------ */
-        function readCache() {
-            try {
-                const raw = localStorage.getItem(CONFIG.cacheKey);
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                if (!parsed || !Array.isArray(parsed.repos)) return null;
-                if (typeof parsed.timestamp !== 'number') return null;
-                return parsed;
-            } catch (err) {
-                return null;
-            }
-        }
-
-        function writeCache(repos) {
-            try {
-                localStorage.setItem(CONFIG.cacheKey, JSON.stringify({
-                    timestamp: Date.now(),
-                    repos: repos
-                }));
-            } catch (err) {
-                // Quota exceeded / private mode — non-fatal.
-            }
-        }
-
-        /* ------------------------------------------------------------------
-           Filtering & rendering
-        ------------------------------------------------------------------ */
-        function selectLiveProjects(repos) {
-            const excluded = new Set(CONFIG.excludedRepos.map(n => n.toLowerCase()));
-
-            return repos
-                .filter(repo => {
-                    if (!repo || typeof repo.name !== 'string') return false;
-                    if (repo.disabled) return false;
-                    if (CONFIG.excludeArchived && repo.archived) return false;
-                    if (CONFIG.excludeForks && repo.fork) return false;
-                    if (excluded.has(repo.name.toLowerCase())) return false;
-
-                    const homepage = (repo.homepage || '').trim();
-                    return Boolean(repo.has_pages) || homepage.length > 0;
-                })
-                .map(repo => Object.assign({}, repo, { __liveUrl: resolveLiveUrl(repo) }))
-                .filter(repo => Boolean(repo.__liveUrl));
-        }
-
-        function resolveLiveUrl(repo) {
-            const homepage = (repo.homepage || '').trim();
-
-            if (homepage) {
-                if (/^https?:\/\//i.test(homepage)) return homepage;
-                if (homepage.includes('.') && !/\s/.test(homepage)) {
-                    return 'https://' + homepage;
-                }
+            const data = await res.json();
+            if (!data || !Array.isArray(data.projects)) {
+                throw new Error('Invalid projects file format.');
             }
 
-            if (repo.has_pages && repo.owner && repo.owner.login) {
-                return 'https://' + repo.owner.login + '.github.io/' + repo.name + '/';
-            }
+            return normalizeProjects(data.projects);
+        }
 
+        function normalizeProjects(projects) {
+            return projects
+                .filter(project => project && typeof project.title === 'string')
+                .map(project => ({
+                    title: project.title.trim(),
+                    description: (project.description && project.description.trim()) ||
+                        'Interactive frontend interface and data presentation.',
+                    liveUrl: normalizeUrl(project.liveUrl),
+                    sourceUrl: normalizeUrl(project.sourceUrl)
+                }))
+                .filter(project => Boolean(project.liveUrl));
+        }
+
+        function normalizeUrl(url) {
+            const value = (url || '').trim();
+            if (!value) return null;
+            if (/^https?:\/\//i.test(value)) return value;
+            if (value.includes('.') && !/\s/.test(value)) return 'https://' + value;
             return null;
         }
 
-        function renderProjects(rawRepos) {
-            const projects = selectLiveProjects(rawRepos || []);
-
+        /* ------------------------------------------------------------------
+           Rendering
+        ------------------------------------------------------------------ */
+        function renderProjects(projects) {
             hideLoading();
             hideError();
 
@@ -821,17 +690,13 @@
                 (projects.length === 1 ? ' Project' : ' Projects');
 
             const fragment = document.createDocumentFragment();
-            projects.forEach(repo => fragment.appendChild(buildCard(repo)));
+            projects.forEach(project => fragment.appendChild(buildCard(project)));
 
             els.grid.replaceChildren(fragment);
             els.grid.classList.remove('hidden');
         }
 
-        function buildCard(repo) {
-            const title       = formatTitle(repo.name);
-            const description = (repo.description && repo.description.trim()) ||
-                                'Interactive frontend interface and data presentation.';
-
+        function buildCard(project) {
             const card = document.createElement('article');
             card.className = 'project-card rounded-lg p-5 sm:p-6 flex flex-col justify-between';
 
@@ -845,10 +710,10 @@
 
             const link = document.createElement('a');
             link.className = 'card-link';
-            link.href = repo.__liveUrl;
+            link.href = project.liveUrl;
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
-            link.textContent = title;
+            link.textContent = project.title;
             h3.appendChild(link);
 
             const icon = document.createElement('i');
@@ -859,31 +724,34 @@
 
             const p = document.createElement('p');
             p.className = 'text-xs sm:text-sm text-gray-400 font-light leading-relaxed mb-6';
-            p.textContent = description;
+            p.textContent = project.description;
 
             top.append(head, p);
+            card.appendChild(top);
 
-            const footer = document.createElement('div');
-            footer.className = 'flex items-center justify-start gap-3 pt-4 border-t border-darkborder/60';
+            if (project.sourceUrl) {
+                const footer = document.createElement('div');
+                footer.className = 'flex items-center justify-start gap-3 pt-4 border-t border-darkborder/60';
 
-            const source = document.createElement('a');
-            source.className = 'source-btn text-xs font-sans px-3 py-1.5 rounded-md flex items-center gap-1.5';
-            source.href = repo.html_url;
-            source.target = '_blank';
-            source.rel = 'noopener noreferrer';
-            source.title = 'View source on GitHub';
+                const source = document.createElement('a');
+                source.className = 'source-btn text-xs font-sans px-3 py-1.5 rounded-md flex items-center gap-1.5';
+                source.href = project.sourceUrl;
+                source.target = '_blank';
+                source.rel = 'noopener noreferrer';
+                source.title = 'View source on GitHub';
 
-            const ghIcon = document.createElement('i');
-            ghIcon.className = 'fa-brands fa-github text-sm';
-            ghIcon.setAttribute('aria-hidden', 'true');
+                const ghIcon = document.createElement('i');
+                ghIcon.className = 'fa-brands fa-github text-sm';
+                ghIcon.setAttribute('aria-hidden', 'true');
 
-            const sourceLabel = document.createElement('span');
-            sourceLabel.textContent = 'Source';
+                const sourceLabel = document.createElement('span');
+                sourceLabel.textContent = 'Source';
 
-            source.append(ghIcon, sourceLabel);
-            footer.appendChild(source);
+                source.append(ghIcon, sourceLabel);
+                footer.appendChild(source);
+                card.appendChild(footer);
+            }
 
-            card.append(top, footer);
             return card;
         }
 
@@ -900,37 +768,23 @@
             if (els.loading) els.loading.classList.add('hidden');
         }
 
-        function showError(err) {
+        function showError() {
             hideLoading();
             els.grid.classList.add('hidden');
             els.count.textContent = 'Error';
-
-            if (err && err.isRateLimit) {
-                els.errorTitle.textContent = 'GitHub API rate limit reached.';
-                els.errorMessage.textContent = err.resetAt
-                    ? 'Try again in about ' + minutesUntil(err.resetAt) + ' minute(s).'
-                    : 'Please try again a little later.';
-            } else {
-                els.errorTitle.textContent = 'Unable to load repositories right now.';
-                els.errorMessage.textContent = 'Please check back again shortly.';
-            }
-
+            els.errorTitle.textContent = 'Unable to load projects right now.';
+            els.errorMessage.textContent = 'Please check back again shortly.';
             els.error.classList.remove('hidden');
         }
 
         function showEmpty() {
-            els.errorTitle.textContent = 'No live project demos found at this time.';
+            els.errorTitle.textContent = 'No projects listed at this time.';
             els.errorMessage.textContent = 'Check back soon — new projects are added regularly.';
             els.error.classList.remove('hidden');
         }
 
         function hideError() {
             els.error.classList.add('hidden');
-        }
-
-        function minutesUntil(timestamp) {
-            const diff = Math.max(0, timestamp - Date.now());
-            return Math.max(1, Math.ceil(diff / 60000));
         }
 
         /* ------------------------------------------------------------------
@@ -987,18 +841,6 @@
             }
         }
 
-        /* ------------------------------------------------------------------
-           Utilities
-        ------------------------------------------------------------------ */
-        function formatTitle(str) {
-            return String(str)
-                .replace(/[-_]+/g, ' ')
-                .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-                .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
-                .replace(/\s+/g, ' ')
-                .trim()
-                .replace(/\b\w/g, c => c.toUpperCase());
-        }
     })();
     </script>
     <script data-goatcounter="https://vlosyrosportfolio.goatcounter.com/count"
