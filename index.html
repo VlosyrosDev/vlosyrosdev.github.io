@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Vlosyros — data collection, processing, analysis, and games.">
+    <meta name="description" content="Vlosyros — data collection, processing, analysis, and games. Projects include Male Preferences Analysis, Mauritian Peaks Visualizer, and Games.">
     <meta name="theme-color" content="#111111">
     <title>Vlosyros</title>
 
-    <!-- Projects data — edit here to add or update projects -->
+    <!-- Projects data — edit here, then sync the JSON-LD block and #projects-grid HTML below -->
     <script id="projects-data" type="application/json">
 {
   "projects": [
@@ -27,6 +27,49 @@
       "title": "Games",
       "description": "A collection of games I have developed or helped develop.",
       "liveUrl": "https://vlosyros.itch.io"
+    }
+  ]
+}
+    </script>
+
+    <!-- Structured project list for crawlers and LLM fetchers (mirrors projects-data above) -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Vlosyros Projects",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "CreativeWork",
+        "name": "Male Preferences Analysis",
+        "description": "Replication study involving the preferences of males when it comes to buttocks or breasts.",
+        "url": "https://vlosyros.dev/PreferencesAnalysis",
+        "codeRepository": "https://github.com/VlosyrosDev/PreferencesAnalysis"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "CreativeWork",
+        "name": "Mauritian Peaks Visualizer",
+        "description": "3D representation of all geographical peaks in Mauritius; both named and unnamed.",
+        "url": "https://vlosyros.dev/PeakVisualizer",
+        "codeRepository": "https://github.com/VlosyrosDev/PeakVisualizer"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "item": {
+        "@type": "CreativeWork",
+        "name": "Games",
+        "description": "A collection of games I have developed or helped develop.",
+        "url": "https://vlosyros.itch.io"
+      }
     }
   ]
 }
@@ -321,7 +364,7 @@
                 <span id="project-count"
                       class="text-xs text-gray-500 font-sans tracking-wider uppercase"
                       aria-live="polite"
-                      aria-atomic="true"></span>
+                      aria-atomic="true">3 Projects</span>
             </div>
 
             <!-- Loading Skeleton (unused — projects are inlined in <head>) -->
@@ -356,9 +399,55 @@
                 </button>
             </div>
 
-            <!-- Projects Grid -->
-            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 hidden">
-                <!-- Dynamically populated -->
+            <!-- Projects Grid (static HTML for no-JS crawlers; JS refreshes from #projects-data) -->
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <article class="project-card rounded-lg p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <h3 class="card-title text-lg sm:text-xl font-bold text-white transition-colors duration-200">
+                                <a class="card-link" href="https://vlosyros.dev/PreferencesAnalysis" target="_blank" rel="noopener noreferrer">Male Preferences Analysis</a>
+                            </h3>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs sm:text-sm external-icon opacity-50 transition-all duration-200" aria-hidden="true"></i>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-400 font-light leading-relaxed mb-6">Replication study involving the preferences of males when it comes to buttocks or breasts.</p>
+                    </div>
+                    <div class="flex items-center justify-start gap-3 pt-4 border-t border-darkborder/60">
+                        <a class="source-btn text-xs font-sans px-3 py-1.5 rounded-md flex items-center gap-1.5" href="https://github.com/VlosyrosDev/PreferencesAnalysis" target="_blank" rel="noopener noreferrer" title="View source on GitHub">
+                            <i class="fa-brands fa-github text-sm" aria-hidden="true"></i>
+                            <span>Source</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="project-card rounded-lg p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <h3 class="card-title text-lg sm:text-xl font-bold text-white transition-colors duration-200">
+                                <a class="card-link" href="https://vlosyros.dev/PeakVisualizer" target="_blank" rel="noopener noreferrer">Mauritian Peaks Visualizer</a>
+                            </h3>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs sm:text-sm external-icon opacity-50 transition-all duration-200" aria-hidden="true"></i>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-400 font-light leading-relaxed mb-6">3D representation of all geographical peaks in Mauritius; both named and unnamed.</p>
+                    </div>
+                    <div class="flex items-center justify-start gap-3 pt-4 border-t border-darkborder/60">
+                        <a class="source-btn text-xs font-sans px-3 py-1.5 rounded-md flex items-center gap-1.5" href="https://github.com/VlosyrosDev/PeakVisualizer" target="_blank" rel="noopener noreferrer" title="View source on GitHub">
+                            <i class="fa-brands fa-github text-sm" aria-hidden="true"></i>
+                            <span>Source</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="project-card rounded-lg p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <h3 class="card-title text-lg sm:text-xl font-bold text-white transition-colors duration-200">
+                                <a class="card-link" href="https://vlosyros.itch.io" target="_blank" rel="noopener noreferrer">Games</a>
+                            </h3>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs sm:text-sm external-icon opacity-50 transition-all duration-200" aria-hidden="true"></i>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-400 font-light leading-relaxed mb-6">A collection of games I have developed or helped develop.</p>
+                    </div>
+                </article>
             </div>
         </main>
 
@@ -648,7 +737,9 @@
                 renderProjects(projects);
             } catch (err) {
                 console.error('[vlosyros] Failed to load projects:', err);
-                showError(err);
+                if (!els.grid || els.grid.children.length === 0) {
+                    showError(err);
+                }
             } finally {
                 state.loading = false;
             }
@@ -697,10 +788,11 @@
             hideError();
 
             if (!projects.length) {
-                els.grid.classList.add('hidden');
-                els.grid.replaceChildren();
-                els.count.textContent = '0 Projects';
-                showEmpty();
+                if (els.grid.children.length === 0) {
+                    els.grid.classList.add('hidden');
+                    els.count.textContent = '0 Projects';
+                    showEmpty();
+                }
                 return;
             }
 
