@@ -7,6 +7,31 @@
     <meta name="theme-color" content="#111111">
     <title>Vlosyros</title>
 
+    <!-- Projects data — edit here to add or update projects -->
+    <script id="projects-data" type="application/json">
+{
+  "projects": [
+    {
+      "title": "Male Preferences Analysis",
+      "description": "Replication study involving the preferences of males when it comes to buttocks or breasts.",
+      "liveUrl": "https://vlosyros.dev/PreferencesAnalysis",
+      "sourceUrl": "https://github.com/VlosyrosDev/PreferencesAnalysis"
+    },
+    {
+      "title": "Mauritian Peaks Visualizer",
+      "description": "3D representation of all geographical peaks in Mauritius; both named and unnamed.",
+      "liveUrl": "https://vlosyros.dev/PeakVisualizer",
+      "sourceUrl": "https://github.com/VlosyrosDev/PeakVisualizer"
+    },
+    {
+      "title": "Games",
+      "description": "A collection of games I have developed or helped develop.",
+      "liveUrl": "https://vlosyros.itch.io"
+    }
+  ]
+}
+    </script>
+
     <!-- Favicon for Standard Web Browsers -->
     <link rel="icon" type="image/png" href="logo.png">
 
@@ -296,11 +321,11 @@
                 <span id="project-count"
                       class="text-xs text-gray-500 font-sans tracking-wider uppercase"
                       aria-live="polite"
-                      aria-atomic="true">Loading…</span>
+                      aria-atomic="true"></span>
             </div>
 
-            <!-- Loading Skeleton -->
-            <div id="loading" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" aria-hidden="true">
+            <!-- Loading Skeleton (unused — projects are inlined in <head>) -->
+            <div id="loading" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" aria-hidden="true">
                 <div class="rounded-lg border border-darkborder bg-darkcard p-5 sm:p-6">
                     <div class="skeleton h-5 w-2/3 mb-4"></div>
                     <div class="skeleton h-3 w-full mb-2"></div>
@@ -405,7 +430,6 @@
         'use strict';
 
         const CONFIG = {
-            projectsUrl: 'projects.json',
             pressReleaseDelay: 50,
             scrollThreshold: 8,
             clickGestureWindow: 500
@@ -613,15 +637,14 @@
         /* ------------------------------------------------------------------
            Data loading
         ------------------------------------------------------------------ */
-        async function loadProjects() {
+        function loadProjects() {
             if (state.loading) return;
             state.loading = true;
 
-            showLoading();
             hideError();
 
             try {
-                const projects = await fetchProjects();
+                const projects = getProjectsData();
                 renderProjects(projects);
             } catch (err) {
                 console.error('[vlosyros] Failed to load projects:', err);
@@ -631,20 +654,15 @@
             }
         }
 
-        async function fetchProjects() {
-            const res = await fetch(CONFIG.projectsUrl, {
-                headers: { 'Accept': 'application/json' }
-            });
-
-            if (!res.ok) {
-                const error = new Error('Failed to load projects (' + res.status + ').');
-                error.status = res.status;
-                throw error;
+        function getProjectsData() {
+            const el = document.getElementById('projects-data');
+            if (!el) {
+                throw new Error('Projects data not found.');
             }
 
-            const data = await res.json();
+            const data = JSON.parse(el.textContent);
             if (!data || !Array.isArray(data.projects)) {
-                throw new Error('Invalid projects file format.');
+                throw new Error('Invalid projects data format.');
             }
 
             return normalizeProjects(data.projects);
