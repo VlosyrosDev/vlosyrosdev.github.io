@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://vlosyros.dev/sitemap.xml
 Sitemap: https://vlosyros.dev/PreferencesAnalysis/sitemap.xml
